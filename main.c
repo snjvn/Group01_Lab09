@@ -66,8 +66,9 @@ int main(void)
 }
 
 void INIT_GPIO_PORTF_REGISTERS(){
-    GPIO_PORTF_LOCK_R = 0x4C4F434B;     /* unlock commit register */
+
     SYSCTL_RCGCGPIO_R |= 0x20;
+    GPIO_PORTF_LOCK_R = 0x4C4F434B;     /* unlock commit register */
     GPIO_PORTF_CR_R = 0x1F;             /* make PORTF configurable */
     GPIO_PORTF_DEN_R = 0x1F;            /* set PORTF pins 4 : 0 pins */
     GPIO_PORTF_DIR_R = 0x0E;            /*  */
@@ -76,21 +77,25 @@ void INIT_GPIO_PORTF_REGISTERS(){
 }
 
 void INIT_GPIO_PORTB_REGISTERS(){
-    GPIO_PORTB_LOCK_R = 0x4C4F434B;     /* unlock commit register */
+
     SYSCTL_RCGCGPIO_R |= 0x02;
+    GPIO_PORTB_LOCK_R = 0x4C4F434B;     /* unlock commit register */
     GPIO_PORTB_DEN_R = 0x0C;
     GPIO_PORTB_AFSEL_R = 0x0C;
     GPIO_PORTB_ODR_R = 0x08;
     GPIO_PORTB_PCTL_R = 0x3300;
+    GPIO_PORTB_PUR_R = 0x0C;
     //GPIODIR
 }
 
 void INIT_GPIO_PORTA_REGISTERS(){
-    GPIO_PORTA_LOCK_R = 0x4C4F434B;     /* unlock commit register */
+
     SYSCTL_RCGCGPIO_R |= 0x01;
-    GPIO_PORTA_DEN_R = 0x0C;
+    GPIO_PORTA_LOCK_R = 0x4C4F434B;     /* unlock commit register */
+    GPIO_PORTA_DEN_R = 0xC0;
     GPIO_PORTA_AFSEL_R = 0xC0;
     GPIO_PORTA_ODR_R = 0x80;
     GPIO_PORTA_PCTL_R = 0x33000000;
+    GPIO_PORTA_PUR_R = 0xC0;
     //GPIODIR
 }
