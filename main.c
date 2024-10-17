@@ -34,7 +34,7 @@ int main(void)
         }
         I2C0_MCS_R = 0x07; /// initiate transmit
 
-        if (I2C0_MCS_R & 0x04){ // check if any error was detected in last operation
+        while (I2C0_MCS_R & 0x04){ // check if any error was detected in last operation
             ;
         }
         if ((I2C0_MCS_R & 0x04) == 0x00){
