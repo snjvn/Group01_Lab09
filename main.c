@@ -9,7 +9,8 @@ int main(void)
 {
     INIT_GPIO_PORTF_REGISTERS();
     INIT_GPIO_PORTB_REGISTERS();
-    uint8_t slave_status = 0x00;
+    INIT_GPIO_PORTA_REGISTERS();
+//    uint8_t slave_status = 0x00;
 
     SYSCTL_RCGCI2C_R = 0x03;
 
@@ -40,7 +41,7 @@ int main(void)
         }
 
         while( (I2C1_SCSR_R & 0x01) == 0x00 ){
-            ; // wait till I2C module received
+            ; // wait till I2C module received the data
         }
 
         if (I2C1_SDR_R == 0xAF){
@@ -61,6 +62,7 @@ void INIT_GPIO_PORTF_REGISTERS(){
 }
 
 void INIT_GPIO_PORTB_REGISTERS(){
+    GPIO_PORTB_LOCK_R = 0x4C4F434B;     /* unlock commit register */
     SYSCTL_RCGCGPIO_R |= 0x02;
     GPIO_PORTB_DEN_R = 0x0C;
     GPIO_PORTB_AFSEL_R = 0x0C;
@@ -70,6 +72,7 @@ void INIT_GPIO_PORTB_REGISTERS(){
 }
 
 void INIT_GPIO_PORTA_REGISTERS(){
+    GPIO_PORTA_LOCK_R = 0x4C4F434B;     /* unlock commit register */
     SYSCTL_RCGCGPIO_R |= 0x01;
     GPIO_PORTA_DEN_R = 0x0C;
     GPIO_PORTA_AFSEL_R = 0xC0;
