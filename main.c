@@ -14,10 +14,10 @@ int main(void)
 
     SYSCTL_RCGCI2C_R = 0x03;
 
-    // master rx
-    I2C1_MCR_R = 0x10;
-    I2C1_MSA_R = 0x76;
-    I2C1_MTPR_R = 0x09;
+    // slave rx
+    I2C1_MCR_R = 0x20;
+    I2C1_SOAR_R = 0x3B;
+    I2C1_SCSR_R = 0x01;
 
     // master tx
     I2C0_MCR_R = 0x10;
@@ -44,23 +44,26 @@ int main(void)
             GPIO_PORTF_DATA_R = 0x02;
         }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-        while(I2C1_MCS_R & 0x40){
-            ;// wait till BUSBSY bit of MCS is cleared
+        while((I2C1_SCSR_R & 0x01) == 0){
+            ;// wait for RREQ
         }
-        I2C1_MCS_R = 0x07; /// initiate transmit
+        GPIO_PORTF_DATA_R = 0x0E;
+        if(I2C1_SDR_R == 0xAF){
+            GPIO_PORTF_DATA_R = 0x04;
+        }
 
-        if (I2C1_MCS_R & 0x04){ // check if any error was detected in last operation
-            ;
-        }
-        if ((I2C1_MCS_R & 0x04) == 0x00){
-            GPIO_PORTF_DATA_R = 0x0E;
-            if (I2C1_MDR_R == 0xAF){
-                GPIO_PORTF_DATA_R = 0x04;
-            }
-        }
-        else if ((I2C1_MCS_R & 0x04) != 0x00){
-            GPIO_PORTF_DATA_R = 0x02;
-        }
+//        if (I2C1_MCS_R & 0x04){ // check if any error was detected in last operation
+//            ;
+//        }
+//        if ((I2C1_MCS_R & 0x04) == 0x00){
+//            GPIO_PORTF_DATA_R = 0x0E;
+//            if (I2C1_MDR_R == 0xAF){
+//                GPIO_PORTF_DATA_R = 0x04;
+//            }
+//        }
+//        else if ((I2C1_MCS_R & 0x04) != 0x00){
+//            GPIO_PORTF_DATA_R = 0x02;
+//        }
     }
     return 0;
 }
@@ -96,6 +99,6 @@ void INIT_GPIO_PORTA_REGISTERS(){
     GPIO_PORTA_AFSEL_R = 0xC0;
     GPIO_PORTA_ODR_R = 0x80;
     GPIO_PORTA_PCTL_R = 0x33000000;
-    GPIO_PORTA_PUR_R = 0xC0;
+//    GPIO_PORTA_PUR_R = 0xC0;
     //GPIODIR
 }
