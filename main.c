@@ -103,3 +103,33 @@ void INIT_GPIO_PORTA_REGISTERS(){
 //    GPIO_PORTA_PUR_R = 0xC0;
     //GPIODIR
 }
+
+void TxDAC(uint8_t Slave_Addr, int n_bytes, uint32_t data){
+    int num_bytes_sent = 0;
+    I2C0_MSA_R = Slave_Addr;
+    I2C0_MDR_R = (data & 0xFF);
+    I2C0_MCS_R = 0x03;
+    while (num_bytes_sent <= n_bytes){
+        num_bytes_sent ++;
+        while(I2C0_MCS_R & 0x40){
+            ;// wait till BUSBSY bit of MCS is cleared
+        }
+        if (I2C0_MCS_R & 0x02){ // check for error bit in MCS
+            GPIO_PORTF_DATA_R = 0x02;
+            return;
+        }
+
+        I2C0_MDR_R = ( (data >> num_bytes_sent) & 0xFF );
+        if (num_bytes_sent < n_bytes){
+            I2C0_MCS_R = 0x01;
+        }
+    }
+    I2C0_MCS_R = 0x05;
+
+    while(I2C0_MCS_R & 0x40){
+        ;// wait till BUSBSY bit of MCS is cleared
+    }
+    if (I2C0_MCS_R & 0x02){ // check for error bit in MCS
+        GPIO_PORTF_DATA_R = 0x02;
+    }
+}
