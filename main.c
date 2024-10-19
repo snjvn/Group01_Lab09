@@ -38,7 +38,8 @@ int main(void)
             ;
         }
         if ((I2C0_MCS_R & 0x04) == 0x00){
-            GPIO_PORTF_DATA_R = 0x08;
+//            GPIO_PORTF_DATA_R = 0x08;
+            ;
         }
         else if ((I2C0_MCS_R & 0x04) != 0x00){
             GPIO_PORTF_DATA_R = 0x02;
@@ -47,7 +48,7 @@ int main(void)
         while((I2C1_SCSR_R & 0x01) == 0){
             ;// wait for RREQ
         }
-        GPIO_PORTF_DATA_R = 0x0E;
+//        GPIO_PORTF_DATA_R = 0x0E;
         if(I2C1_SDR_R == 0xAF){
             GPIO_PORTF_DATA_R = 0x04;
         }
