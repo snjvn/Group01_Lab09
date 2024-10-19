@@ -116,7 +116,7 @@ void TxDAC(uint8_t Slave_Addr, int n_bytes, uint32_t data){
     else{
         I2C0_MCS_R = 0x03;
     }
-    while (num_bytes_sent <= n_bytes){
+    while (num_bytes_sent < n_bytes){
         num_bytes_sent ++;
 
         while(I2C0_MCS_R & 0x40){
