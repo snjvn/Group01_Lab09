@@ -27,49 +27,11 @@ int main(void)
     I2C0_MTPR_R = 0x09;
     I2C0_MSA_R = 0x00;// initializing
 
-    uint32_t TxData = 0x030201;
-    uint8_t slave_address = 0x3B;
+    uint32_t TxData = 0x0000;
+    uint8_t slave_address = 0x60;
 
     while(1){
         TxDAC(slave_address, 2, TxData);
-
-//        I2C0_MDR_R = 0xAF;
-//
-//
-//        while(I2C0_MCS_R & 0x40){
-//            ;// wait till BUSBSY bit of MCS is cleared
-//        }
-//        I2C0_MCS_R = 0x07; /// initiate transmit
-//
-//        while (I2C0_MCS_R & 0x04){ // check if any error was detected in last operation
-//            ;
-//        }
-//        if ((I2C0_MCS_R & 0x04) == 0x00){
-////            GPIO_PORTF_DATA_R = 0x08;
-//            ;
-//        }
-//        else if ((I2C0_MCS_R & 0x04) != 0x00){
-//            GPIO_PORTF_DATA_R = 0x02;
-//        }
-////////////////////////////////////////////////////////////////////////////////////////////////////
-//        while((I2C1_SCSR_R & 0x01) == 0){
-//            ;// wait for RREQ
-//        }
-//        GPIO_PORTF_DATA_R = 0x0E;
-
-
-//        if (I2C1_MCS_R & 0x04){ // check if any error was detected in last operation
-//            ;
-//        }
-//        if ((I2C1_MCS_R & 0x04) == 0x00){
-//            GPIO_PORTF_DATA_R = 0x0E;
-//            if (I2C1_MDR_R == 0xAF){
-//                GPIO_PORTF_DATA_R = 0x04;
-//            }
-//        }
-//        else if ((I2C1_MCS_R & 0x04) != 0x00){
-//            GPIO_PORTF_DATA_R = 0x02;
-//        }
     }
     return 0;
 }
@@ -159,5 +121,5 @@ void I2C_SLAVE_HANDLER(){
         GPIO_PORTF_DATA_R = 0x08;
     }
     I2C1_SICR_R = 0x01;
-    I2C1_SIMR_R = 0x01; // interrupt enabled for data rx at slave
+//    I2C1_SIMR_R = 0x01; // interrupt enabled for data rx at slave
 }
