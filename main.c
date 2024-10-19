@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include "tm4c123gh6pm.h"
 
+void I2C_SLAVE_HANDLER();
+
 /**
  * main.c
  */
@@ -10,24 +12,27 @@ int main(void)
     INIT_GPIO_PORTF_REGISTERS();
     INIT_GPIO_PORTB_REGISTERS();
     INIT_GPIO_PORTA_REGISTERS();
-//    uint8_t slave_status = 0x00;
 
     SYSCTL_RCGCI2C_R = 0x03;
-
+    NVIC_EN1_R = 0x00000020; // NVIC enable for I2C module 1
     // slave rx
     I2C1_MCR_R = 0x20;
     I2C1_SOAR_R = 0x3B;
     I2C1_SCSR_R = 0x01;
+    I2C1_SIMR_R = 0x01; // interrupt enabled for data rx at slave
+
 
     // master tx
     I2C0_MCR_R = 0x10;
     I2C0_MTPR_R = 0x09;
     I2C0_MSA_R = 0x00;// initializing
+
     uint32_t TxData = 0x030201;
     uint8_t slave_address = 0x3B;
 
     while(1){
         TxDAC(slave_address, 2, TxData);
+
 //        I2C0_MDR_R = 0xAF;
 //
 //
@@ -51,16 +56,7 @@ int main(void)
 //            ;// wait for RREQ
 //        }
 //        GPIO_PORTF_DATA_R = 0x0E;
-        if(I2C1_SDR_R == 0x01){
-            GPIO_PORTF_DATA_R = 0x02;
-        }
 
-        else if(I2C1_SDR_R == 0x02){
-            GPIO_PORTF_DATA_R = 0x04;
-        }
-        else if(I2C1_SDR_R == 0x03){
-            GPIO_PORTF_DATA_R = 0x08;
-        }
 
 //        if (I2C1_MCS_R & 0x04){ // check if any error was detected in last operation
 //            ;
@@ -149,6 +145,19 @@ void TxDAC(uint8_t Slave_Addr, int n_bytes, uint32_t data){
             }
         }
     }
+}
 
+void I2C_SLAVE_HANDLER(){
+    if(I2C1_SDR_R == 0x01){
+        GPIO_PORTF_DATA_R = 0x0A;
+    }
 
+    else if(I2C1_SDR_R == 0x02){
+        GPIO_PORTF_DATA_R = 0x04;
+    }
+    else if(I2C1_SDR_R == 0x03){
+        GPIO_PORTF_DATA_R = 0x08;
+    }
+    I2C1_SICR_R = 0x01;
+    I2C1_SIMR_R = 0x01; // interrupt enabled for data rx at slave
 }
