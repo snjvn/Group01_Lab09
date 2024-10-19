@@ -23,11 +23,11 @@ int main(void)
     I2C0_MCR_R = 0x10;
     I2C0_MTPR_R = 0x09;
     I2C0_MSA_R = 0x00;// initializing
-    uint32_t TxData = 0xAFAF;
+    uint32_t TxData = 0x030201;
     uint8_t slave_address = 0x3B;
 
     while(1){
-        TxDAC(slave_address, 1, TxData);
+        TxDAC(slave_address, 2, TxData);
 //        I2C0_MDR_R = 0xAF;
 //
 //
@@ -47,12 +47,19 @@ int main(void)
 //            GPIO_PORTF_DATA_R = 0x02;
 //        }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-        while((I2C1_SCSR_R & 0x01) == 0){
-            ;// wait for RREQ
-        }
+//        while((I2C1_SCSR_R & 0x01) == 0){
+//            ;// wait for RREQ
+//        }
 //        GPIO_PORTF_DATA_R = 0x0E;
-        if(I2C1_SDR_R == 0xAF){
+        if(I2C1_SDR_R == 0x01){
+            GPIO_PORTF_DATA_R = 0x02;
+        }
+
+        else if(I2C1_SDR_R == 0x02){
             GPIO_PORTF_DATA_R = 0x04;
+        }
+        else if(I2C1_SDR_R == 0x03){
+            GPIO_PORTF_DATA_R = 0x08;
         }
 
 //        if (I2C1_MCS_R & 0x04){ // check if any error was detected in last operation
@@ -112,6 +119,7 @@ void TxDAC(uint8_t Slave_Addr, int n_bytes, uint32_t data){
     I2C0_MDR_R = (data & 0xFF);
     if (n_bytes == 1){
         I2C0_MCS_R = 0x07;
+        num_bytes_sent ++;
     }
     else{
         I2C0_MCS_R = 0x03;
@@ -127,19 +135,20 @@ void TxDAC(uint8_t Slave_Addr, int n_bytes, uint32_t data){
             return;
         }
 
-        I2C0_MDR_R = ( (data >> num_bytes_sent) & 0xFF );
+        I2C0_MDR_R = ( (data >> 8*num_bytes_sent) & 0xFF );
         if (num_bytes_sent < n_bytes){
             I2C0_MCS_R = 0x01;
         }
         else{
             I2C0_MCS_R = 0x05;
+            while(I2C0_MCS_R & 0x40){
+                ;// wait till BUSBSY bit of MCS is cleared
+            }
+            if (I2C0_MCS_R & 0x02){ // check for error bit in MCS
+                GPIO_PORTF_DATA_R = 0x02;
+            }
         }
     }
 
-    while(I2C0_MCS_R & 0x40){
-        ;// wait till BUSBSY bit of MCS is cleared
-    }
-    if (I2C0_MCS_R & 0x02){ // check for error bit in MCS
-        GPIO_PORTF_DATA_R = 0x02;
-    }
+
 }
