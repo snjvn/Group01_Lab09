@@ -27,11 +27,11 @@ int main(void)
     I2C0_MTPR_R = 0x09;
     I2C0_MSA_R = 0x00;// initializing
 
-    uint32_t TxData = 0x0000;
+    uint32_t TxData = 0x0008;
     uint8_t slave_address = 0x60;
-
+    TxDAC(slave_address, 2, TxData);
     while(1){
-        TxDAC(slave_address, 2, TxData);
+        ;
     }
     return 0;
 }
@@ -85,7 +85,7 @@ void TxDAC(uint8_t Slave_Addr, int n_bytes, uint32_t data){
     while (num_bytes_sent < n_bytes){
         num_bytes_sent ++;
 
-        while(I2C0_MCS_R & 0x40){
+        while(I2C0_MCS_R & 0x01){
             ;// wait till BUSBSY bit of MCS is cleared
         }
         if (I2C0_MCS_R & 0x02){ // check for error bit in MCS
@@ -99,7 +99,7 @@ void TxDAC(uint8_t Slave_Addr, int n_bytes, uint32_t data){
         }
         else{
             I2C0_MCS_R = 0x05;
-            while(I2C0_MCS_R & 0x40){
+            while(I2C0_MCS_R & 0x01){
                 ;// wait till BUSBSY bit of MCS is cleared
             }
             if (I2C0_MCS_R & 0x02){ // check for error bit in MCS
