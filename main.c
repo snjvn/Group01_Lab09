@@ -2,11 +2,15 @@
 #include <stdbool.h>
 #include "tm4c123gh6pm.h"
 
-void I2C_SLAVE_HANDLER();
+//void I2C_SLAVE_HANDLER();
+void ISR();
 
 /**
  * main.c
  */
+
+uint32_t TxData = 0x0000;
+
 int main(void)
 {
     INIT_GPIO_PORTF_REGISTERS();
@@ -21,17 +25,21 @@ int main(void)
     I2C1_SCSR_R = 0x01;
     I2C1_SIMR_R = 0x01; // interrupt enabled for data rx at slave
 
+    NVIC_ST_RELOAD_R = 16000*500; // 500 ms
+    NVIC_ST_CURRENT_R = 0x00;
+    NVIC_ST_CTRL_R = 0x00000007;
 
     // master tx
     I2C0_MCR_R = 0x10;
     I2C0_MTPR_R = 0x09;
     I2C0_MSA_R = 0x00;// initializing
 
-    uint32_t TxData = 0x010C;
+
     uint8_t slave_address = 0x60;
-    TxDAC(slave_address, 2, TxData);
+
     while(1){
-        ;
+        TxDAC(slave_address, 2, TxData);
+
     }
     return 0;
 }
@@ -126,4 +134,13 @@ void I2C_SLAVE_HANDLER(){
     }
     I2C1_SICR_R = 0x01;
 //    I2C1_SIMR_R = 0x01; // interrupt enabled for data rx at slave
+}
+
+void ISR(){
+    GPIO_PORTF_DATA_R ^= 0x04;
+    TxData += 100;
+    if(TxData >= 4096){
+        TxData = 0;
+    }
+//    NVIC_ST_CURRENT_R = 16000*500;
 }
