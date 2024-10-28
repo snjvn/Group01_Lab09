@@ -27,11 +27,11 @@ int main(void)
     I2C0_MTPR_R = 0x09;
     I2C0_MSA_R = 0x00;// initializing
 
-    uint32_t TxData = 0x0C01;
+    uint32_t TxData = 0x010C;
     uint8_t slave_address = 0x60;
     TxDAC(slave_address, 2, TxData);
     while(1){
-
+        ;
     }
     return 0;
 }
@@ -72,12 +72,13 @@ void INIT_GPIO_PORTA_REGISTERS(){
 }
 
 void TxDAC(uint8_t Slave_Addr, int n_bytes, uint32_t data){
-
-    uint32_t selector = ( 0xFF << ((n_bytes-1)*8) );
+    uint32_t LSByte = (data & 0xFF);
+    data = data >> 8;
+    data |= (LSByte << 8);
 
     int num_bytes_sent = 0;
     I2C0_MSA_R = (Slave_Addr << 1);
-    I2C0_MDR_R = (data & selector);
+    I2C0_MDR_R = (data & 0xFF);
     if (n_bytes == 1){
         I2C0_MCS_R = 0x07;
         num_bytes_sent ++;
@@ -96,7 +97,7 @@ void TxDAC(uint8_t Slave_Addr, int n_bytes, uint32_t data){
             return;
         }
 
-        I2C0_MDR_R = ( data & (selector >> (8*num_bytes_sent)) );
+        I2C0_MDR_R = ( (data >> 8*num_bytes_sent) & 0xFF );
         if (num_bytes_sent < n_bytes){
             I2C0_MCS_R = 0x01;
         }
