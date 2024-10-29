@@ -25,7 +25,7 @@ int main(void)
     I2C1_SCSR_R = 0x01;
     I2C1_SIMR_R = 0x01; // interrupt enabled for data rx at slave
 
-    NVIC_ST_RELOAD_R = 16000*500; // 500 ms
+    NVIC_ST_RELOAD_R = 16000; // 1 ms
     NVIC_ST_CURRENT_R = 0x00;
     NVIC_ST_CTRL_R = 0x00000007;
 
