@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "tm4c123gh6pm.h"
-
+#include <math.h>
 //void I2C_SLAVE_HANDLER();
 void ISR();
 
@@ -9,8 +9,8 @@ void ISR();
  * main.c
  */
 
-uint32_t TxData = 0x0000;
-
+uint32_t TxData = 0x00;
+uint32_t sine_digitized = 0;
 int main(void)
 {
     INIT_GPIO_PORTF_REGISTERS();
@@ -25,7 +25,7 @@ int main(void)
     I2C1_SCSR_R = 0x01;
     I2C1_SIMR_R = 0x01; // interrupt enabled for data rx at slave
 
-    NVIC_ST_RELOAD_R = 16000; // 1 ms
+    NVIC_ST_RELOAD_R = 160; // 0.01 ms
     NVIC_ST_CURRENT_R = 0x00;
     NVIC_ST_CTRL_R = 0x00000007;
 
@@ -38,7 +38,8 @@ int main(void)
     uint8_t slave_address = 0x60;
 
     while(1){
-        TxDAC(slave_address, 2, TxData);
+        sine_digitized = 2048.0*sin(2*3.14*TxData/4096) + 2047.0;
+        TxDAC(slave_address, 2, sine_digitized);
 
     }
     return 0;
@@ -138,7 +139,8 @@ void I2C_SLAVE_HANDLER(){
 
 void ISR(){
     GPIO_PORTF_DATA_R ^= 0x04;
-    TxData += 10;
+    TxData += 1;
+
     if(TxData >= 4096){
         TxData = 0;
     }
