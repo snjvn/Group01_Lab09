@@ -138,7 +138,7 @@ void I2C_SLAVE_HANDLER(){
 
 void ISR(){
     GPIO_PORTF_DATA_R ^= 0x04;
-    TxData += 100;
+    TxData += 10;
     if(TxData >= 4096){
         TxData = 0;
     }
